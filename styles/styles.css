@@ -1,0 +1,20 @@
+.topBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* จัดให้ "Admin" อยู่ซ้าย และไอคอนอยู่ขวา */
+  align-items: center;
+  padding: 15px 20px; /* paddingVertical: 15, paddingHorizontal: 20 */
+  background-color: #000000; /* สีพื้นหลังดำ */
+}
+
+.topBar .title {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.profile-icon {
+  font-size: 35px;
+  color: white;
+  cursor: pointer;
+}
