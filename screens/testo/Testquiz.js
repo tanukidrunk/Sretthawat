@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import axios from 'axios';
-
-const shuffleArray = (array) => {
-  return array
-    .map((a) => ({ sort: Math.random(), value: a }))
-    .sort((a, b) => a.sort - b.sort)
-    .map((a) => a.value);
-};
-
+ 
+const shuffleArray = (array) =>
+  array.map((a) => ({ sort: Math.random(), value: a }))
+       .sort((a, b) => a.sort - b.sort)
+       .map((a) => a.value);//???????????????
+ 
 export default function Testquiz({ route, navigation }) {
-  const { categoryId, userEmail } = route.params; // เพิ่ม userEmail
+  //???????????
+  const { categoryId, email_member } = route.params; 
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -21,75 +27,9 @@ export default function Testquiz({ route, navigation }) {
   const [answered, setAnswered] = useState([]);
   const [userAnswers, setUserAnswers] = useState([]);
 
-  // -------- FETCH QUESTIONS --------
   useEffect(() => {
     fetchQuestions();
-  }, [categoryId]);
-
-  const fetchQuestions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await axios.get(`http://10.0.2.2:3000/testquestions/${categoryId}`);
-
-      if (response.data && response.data.length > 0) {
-        let shuffled = shuffleArray(response.data);
-        let selected = shuffled.slice(0, 10);
-
-        const opts = selected.map((q) =>
-          shuffleArray([q.answer1, q.answer2, q.answer3, q.correct_answer])
-        );
-
-        setQuestions(selected);
-        setOptionsList(opts);
-        setAnswered(new Array(selected.length).fill(false));
-        setUserAnswers(new Array(selected.length).fill(null));
-      } else {
-        const msg = `No questions found for categoryId: ${categoryId}`;
-        setError(msg);
-        Alert.alert('No Questions', msg, [
-          { text: 'Back', onPress: () => navigation.goBack() },
-        ]);
-      }
-    } catch (err) {
-      let errorMessage = 'Error loading questions';
-      if (err.response) {
-        if (err.response.status === 404)
-          errorMessage = `No questions found for categoryId: ${categoryId}`;
-        else if (err.response.data?.message) errorMessage = err.response.data.message;
-      } else if (err.request) {
-        errorMessage = 'Cannot connect to server';
-      }
-      setError(errorMessage);
-      Alert.alert('Error', errorMessage, [
-        { text: 'Try Again', onPress: fetchQuestions },
-        { text: 'Back', onPress: () => navigation.goBack() },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // -------- SAVE TEST RESULT --------
-  const saveTestResult = async (finalScore, finalUserAnswers) => {
-    try {
-      // รวบรวม question IDs
-      const questionIds = questions.map(q => q.test_questions_id || q.id);
-      
-      await axios.post('http://10.0.2.2:3000/api/saveTestResult', {
-        total_score: finalScore,
-        t_category_id: categoryId,
-        t_email_member: userEmail,
-        test_questions: questionIds
-      });
-      
-      console.log('Test result saved successfully');
-    } catch (error) {
-      console.error('Error saving test result:', error);
-      // ไม่ต้อง Alert เพื่อไม่ให้รบกวนผู้ใช้
-    }
-  };
+  }, [categoryId]);//??????????? categoryId
 
   // -------- TIMER --------
   useEffect(() => {
@@ -99,15 +39,7 @@ export default function Testquiz({ route, navigation }) {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          // บันทึกคะแนนก่อนไปหน้าผลลัพธ์
-          saveTestResult(score, userAnswers);
-          navigation.replace('Resulttest', {
-            score,
-            total: questions.length,
-            questions,
-            userAnswers,
-            categoryId,
-          });
+          handleFinish(score, userAnswers); 
           return 0;
         }
         return prev - 1;
@@ -115,14 +47,66 @@ export default function Testquiz({ route, navigation }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [questions]);
+  }, [questions, score, userAnswers]);
+
+  // -------- FETCH QUESTIONS --------
+  const fetchQuestions = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`http://10.0.2.2:3000/testquestions/${categoryId}`);//???????????backend
+
+      if (response.data && response.data.length > 0) {
+        let shuffled = shuffleArray(response.data);
+        let selected = shuffled.slice(0, 10);
+        const opts = selected.map((q) =>
+          shuffleArray([q.answer1, q.answer2, q.answer3, q.correct_answer])
+        );
+
+        setQuestions(selected);
+        setOptionsList(opts);
+        setAnswered(new Array(selected.length).fill(false));
+        setUserAnswers(new Array(selected.length).fill(null));
+      } else {
+        setError(`No questions found for categoryId: ${categoryId}`);
+      }
+    } catch (err) {
+      setError('Error loading questions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // -------- SAVE TEST RESULT --------
+  const saveTestResult = async (finalScore) => {
+    try {
+      await axios.post('http://10.0.2.2:3000/savetest', {
+        total_score: finalScore,
+        t_category_id: categoryId,
+        t_email_member: email_member, // ใช้ email จาก Member
+      });
+      console.log('บันทึกผลสอบสำเร็จ');
+    } catch (err) {
+      console.error('Error saving test result:', err);
+    }
+  };
+
+  // -------- FINISH TEST --------
+  const handleFinish = (finalScore, finalAnswers) => {
+    saveTestResult(finalScore); //บันทึกลงฐานข้อมูล
+    navigation.replace('Resulttest', {
+      score: finalScore,
+      total: questions.length,
+      questions,
+      userAnswers: finalAnswers,
+      categoryId,
+    });
+  };
 
   // -------- HANDLE SELECT --------
   const handleSelect = (selected) => {
     const currentQ = questions[index];
     const updatedAnswered = [...answered];
     const updatedUserAnswers = [...userAnswers];
-
     updatedAnswered[index] = true;
     updatedUserAnswers[index] = selected;
 
@@ -130,32 +114,22 @@ export default function Testquiz({ route, navigation }) {
     setUserAnswers(updatedUserAnswers);
 
     const isCorrect = selected === currentQ.correct_answer;
-    const updatedScore = score + (isCorrect ? 1 : 0);
-    setScore(updatedScore);
+    const newScore = score + (isCorrect ? 1 : 0);
+    setScore(newScore);
 
     if (index + 1 < questions.length) {
       setTimeout(() => setIndex(index + 1), 500);
     } else {
-      // บันทึกคะแนนเมื่อทำข้อสุดท้ายเสร็จ
-      saveTestResult(updatedScore, updatedUserAnswers);
-      navigation.replace('Resulttest', {
-        score: updatedScore,
-        total: questions.length,
-        questions,
-        userAnswers: updatedUserAnswers,
-        categoryId,
-      });
+      handleFinish(newScore, updatedUserAnswers); 
     }
   };
 
-  // -------- FORMAT TIME --------
   const formatTime = (sec) => {
     const minutes = Math.floor(sec / 60);
     const seconds = sec % 60;
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // -------- RENDER --------
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
@@ -183,12 +157,10 @@ export default function Testquiz({ route, navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* ---------- Header (Timer only) ---------- */}
       <View style={styles.header}>
         <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
       </View>
 
-      {/* ---------- Pagination Dots ---------- */}
       <View style={styles.paginationContainer}>
         {questions.map((_, i) => (
           <View
@@ -202,10 +174,8 @@ export default function Testquiz({ route, navigation }) {
         ))}
       </View>
 
-      {/* ---------- Question ---------- */}
-      <Text style={styles.question}>{currentQ.test_Questions}</Text>
+      <Text style={styles.question}>{`${currentQ.test_Questions}`}</Text>
 
-      {/* ---------- Options ---------- */}
       {options.map((opt, idx) => (
         <TouchableOpacity key={idx} style={styles.btn} onPress={() => handleSelect(opt)}>
           <Text style={styles.btnText}>{opt}</Text>
@@ -223,7 +193,17 @@ const styles = StyleSheet.create({
   paginationContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20, flexWrap: 'wrap' },
   dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#ccc', marginHorizontal: 4, marginVertical: 2 },
   question: { fontSize: 18, marginBottom: 25, lineHeight: 24, color: '#333' },
-  btn: { padding: 15, backgroundColor: '#fff', marginVertical: 8, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3.84, elevation: 5 },
+  btn: {
+    padding: 15,
+    backgroundColor: '#fff',
+    marginVertical: 8,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   btnText: { fontSize: 16, textAlign: 'center' },
   loadingText: { fontSize: 18, color: '#666' },
   errorText: { fontSize: 16, color: '#ff6b6b', textAlign: 'center', marginBottom: 20 },

@@ -17,7 +17,7 @@ import Categorytest from './screens/testo/Categorytest';
 import Testquiz from './screens/testo/Testquiz';
 import Result from './screens/practice/Result';
 import TestHistory from './screens/member/TestHistory';
-import HistoryChart from './screens/member/HistoryChart';
+import History from './screens/member/History';
 
 import Admin from './screens/admin/Admin';
 import Home from './screens/admin/Home';
@@ -25,9 +25,9 @@ import Loginadmin from './screens/admin/Loginadmin';
 import Practiceform from './screens/admin/P/Practiceform';
 import Pquestionform from './screens/admin/P/Pquestionform';
 import Testquesions from './screens/admin/T/Testquesions';
-import Registeradmin from './screens/admin/Registeradmin';
-import ctgp from './screens/admin/P/ctgp';
-import ctgt from './screens/admin/T/ctgt';
+
+import ACategorypractice from './screens/admin/P/ACategorypractice';
+import ACategorytes from './screens/admin/T/ACategorytes';
 import Plist from './screens/admin/P/Plist';
 import PQ from './screens/admin/P/PQ';
 import TQ from './screens/admin/T/TQ';
@@ -35,14 +35,14 @@ import AProfile from './screens/admin/AProfile';
 import Profile from './screens/member/Profile';
 import Resulttest from './screens/testo/Resulttest';
 
-import HistoryMock from './screens/member/HistoryMock';
+
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      {/* ?? เปลี่ยนสี StatusBar ให้เข้ากับ Header */}
+      
       <StatusBar barStyle='light-content' backgroundColor='#000' />
 
       <Stack.Navigator
@@ -52,7 +52,7 @@ export default function App() {
           headerStyle: { backgroundColor: '#000' },
         }}
       >
-        {/* ?? รายชื่อหน้าทั้งหมด */}
+        
         <Stack.Screen name='Login' component={Login} />
         <Stack.Screen name='Register' component={Register} />
         <Stack.Screen name='Guest' component={Guest} />
@@ -65,24 +65,23 @@ export default function App() {
         <Stack.Screen name='Categorytest' component={Categorytest} />
         <Stack.Screen name='Testquiz' component={Testquiz} />
         <Stack.Screen name='TestHistory' component={TestHistory} />
-        <Stack.Screen name='HistoryChart' component={HistoryChart} />
+        
         <Stack.Screen name='Admin' component={Admin} />
         <Stack.Screen name='AProfile' component={AProfile} />
-        <Stack.Screen name='Registeradmin' component={Registeradmin} />
+
         <Stack.Screen name='Home' component={Home} />
         <Stack.Screen name='Loginadmin' component={Loginadmin} />
         <Stack.Screen name='Practiceform' component={Practiceform} />
         <Stack.Screen name='Pquestionform' component={Pquestionform} />
         <Stack.Screen name='Testquesions' component={Testquesions} />
-        <Stack.Screen name='ACategorypractice' component={ctgp} />
-        <Stack.Screen name='ACategorytest' component={ctgt} />
+        <Stack.Screen name='ACategorypractice' component={ACategorypractice} />
+        <Stack.Screen name='ACategorytest' component={ACategorytes} />
         <Stack.Screen name='Plist' component={Plist} />
         <Stack.Screen name='PQ' component={PQ} />
         <Stack.Screen name='TQ' component={TQ} />
         <Stack.Screen name='Resulttest' component={Resulttest} />
+        <Stack.Screen name='History' component={History} />
 
-         <Stack.Screen name='HistoryMock' component={HistoryMock} />
-        
       </Stack.Navigator>
     </NavigationContainer>
   );

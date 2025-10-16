@@ -8,8 +8,9 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import axios from "axios";
-  
+   
 export default function TQ({ route, navigation }) {
   const { questionId, categoryId } = route.params;
 
@@ -18,7 +19,7 @@ export default function TQ({ route, navigation }) {
   const [answer2, setAnswer2] = useState("");
   const [answer3, setAnswer3] = useState("");
   const [correctAnswer, setCorrectAnswer] = useState("");
-
+ 
   useEffect(() => {
     fetchQuestion();
   }, []);

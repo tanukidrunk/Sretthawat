@@ -8,8 +8,10 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+
 import axios from "axios";
- 
+  
 export default function Testquesions({ route, navigation }) {
   const { categoryId } = route.params; 
   const [questions, setQuestions] = useState([]);

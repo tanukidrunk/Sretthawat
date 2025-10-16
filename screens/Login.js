@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import { Ionicons } from '@expo/vector-icons'; // ãªéäÍ¤Í¹
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ export default function Login({ navigation }) {
       Alert.alert('Error', 'Please enter email and password');
       return;
     }
-
+ 
     try {
       const res = await axios.post('http://10.0.2.2:3000/login', {
         email_member: email,

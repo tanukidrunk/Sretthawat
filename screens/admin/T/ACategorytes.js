@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+  
 
 export default function ACategorytest({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);

@@ -1,55 +1,71 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { Ionicons } from '@expo/vector-icons'; // สำหรับไอคอน Back
- 
-export default function HistoryMock({ navigation }) { // รับ props navigation
-  const [history, setHistory] = useState([]);
+import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
-  // ข้อมูลจำลอง
-  const mockHistory = [
-    { test_id: 1, total_score: 5, date: '2025-10-01 10:30:00', t_category_id: 1, t_email_member: 'te@kk.com', t_test_questions_id: 1 },
-    { test_id: 2, total_score: 8, date: '2025-10-03 14:15:00', t_category_id: 1, t_email_member: 'te@kk.com', t_test_questions_id: 2 },
-    { test_id: 3, total_score: 7, date: '2025-10-05 09:00:00', t_category_id: 1, t_email_member: 'te@kk.com', t_test_questions_id: 3 },
-    { test_id: 4, total_score: 6, date: '2025-10-07 16:45:00', t_category_id: 1, t_email_member: 'te@kk.com', t_test_questions_id: 4 },
-  ];
+export default function History({ route, navigation }) {
+  const { categoryId, categoryName } = route.params; 
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ?? ??????????????????????????
+  const fetchHistory = async () => {
+    try {
+      const response = await axios.get(`http://10.0.2.2:3000/history/${categoryId}`);
+      setHistory(response.data);
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setHistory(mockHistory);
+    fetchHistory();
   }, []);
 
-  // ข้อมูลกราฟ
   const chartData = {
     labels: history.map(item => item.date.split(' ')[0]),
     datasets: [
-      { data: history.map(item => item.total_score), color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`, strokeWidth: 2 },
+      {
+        data: history.map(item => item.total_score),
+        color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+        strokeWidth: 2,
+      },
     ],
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.text}>score: {item.total_score}</Text>
-      <Text style={styles.text}>date: {item.date}</Text>
-      <Text style={styles.text}>category: {item.t_category_id}</Text>
+      <Text style={styles.text}>Score: {item.total_score}</Text>
+      <Text style={styles.text}>Date: {item.date}</Text>
+      <Text style={styles.text}>Category ID: {item.t_category_id}</Text>
     </View>
   );
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
-      {/* ปุ่ม Back */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#000000ff" />
         <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Test History</Text>
+      <Text style={styles.title}>Test History — {categoryName}</Text>
 
       {history.length > 0 && (
         <LineChart
           data={chartData}
           width={Dimensions.get('window').width - 32}
           height={220}
-          yAxisSuffix=" score"
           chartConfig={{
             backgroundColor: '#fff',
             backgroundGradientFrom: '#fff',

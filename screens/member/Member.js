@@ -61,7 +61,7 @@ export default function Member({ route, navigation }) {
 
       <TouchableOpacity
         style={[styles.mainBtn, { backgroundColor: '#ffffffff' }]}
-        onPress={() => navigation.navigate('Categorytest')}
+        onPress={() => navigation.navigate('Categorytest', { email_member: user.email_member })}
       >
         <Text style={styles.btnText}>Toeic Test</Text>
       </TouchableOpacity>

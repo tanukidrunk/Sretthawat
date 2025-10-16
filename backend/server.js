@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const SECRET = 'MY_SECRET_KEY'; // เปลี่ยนเป็น env ใน production
+const SECRET = 'MY_SECRET_KEY'; 
 
 // เชื่อมต่อ MySQL
 const db = mysql.createConnection({
@@ -29,6 +29,8 @@ app.get('/test', (req, res) => {
   res.json({ message: 'API OK' });
 });
 
+
+// ______________________________ MEMBER REGIS ______________________________ //
 // Register
 app.post('/register', async (req, res) => {
   const { email_member, first_name, last_name, password } = req.body;
@@ -44,20 +46,8 @@ app.post('/register', async (req, res) => {
   );
 });
 
-// Register Api
-app.post('/registeradmin', async (req, res) => {
-  const { email_admin, first_name, last_name, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
 
-  db.query(
-    'INSERT INTO admin (email_admin, first_name, last_name, password) VALUES (?, ?, ?, ?)',
-    [email_admin, first_name, last_name, hashedPassword],
-    (err, result) => {
-      if (err) return res.status(400).json({ error: err.message });
-      res.json({ message: 'Register successful' });
-    }
-  );
-});
+// ______________________________ MEMBER LOG ______________________________ //
 
 // Login API Member
 app.post('/login', (req, res) => {
@@ -88,6 +78,7 @@ app.post('/login', (req, res) => {
   );
 });
 
+// ______________________________ ADMIN LOG ______________________________ //
 // LoginAdmin API
 app.post('/loginadmin', (req, res) => {
   const { email_admin, password } = req.body;
@@ -187,7 +178,7 @@ app.put('/member/:email_member', async (req, res) => {
                 .json({ success: false, error: err2.message });
 
             res.json({
-              success: true, // <-- เพิ่ม success: true
+              success: true, 
               message: 'Profile updated successfully',
               user: updatedRows[0],
             });
@@ -198,20 +189,27 @@ app.put('/member/:email_member', async (req, res) => {
   );
 });
 
+
+
 //_______________________________ Admin ______________________________ //
-// PUT: แก้ไขโปรไฟล์สมาชิก
 app.put('/admin/:email_admin', async (req, res) => {
   const { email_admin } = req.params;
   const { first_name, last_name, password } = req.body;
 
   if (!first_name || !last_name) {
-    return res.status(400).json({ success: false, error: 'กรุณากรอกชื่อและนามสกุล' });
+    return res.status(400).json({ success: false, error: 'Please fill in your first and last name' });
   }
 
-  db.query('SELECT * FROM admin WHERE email_admin=?', [email_admin], async (err, rows) => {
-    if (err) return res.status(500).json({ success: false, error: err.message });
-    if (rows.length === 0)
-      return res.status(404).json({ success: false, error: 'Member not found' });
+  try {
+    console.log("requests from:", email_admin);
+
+    const [rows] = await db
+      .promise()
+      .query('SELECT * FROM admin WHERE email_admin = ?', [email_admin]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Admin not found' });
+    }
 
     let query = 'UPDATE admin SET first_name=?, last_name=?';
     const params = [first_name, last_name];
@@ -225,25 +223,27 @@ app.put('/admin/:email_admin', async (req, res) => {
     query += ' WHERE email_admin=?';
     params.push(email_admin);
 
-    db.query(query, params, (err) => {
-      if (err) return res.status(500).json({ success: false, error: err.message });
+    await db.promise().query(query, params);
 
-      db.query(
+    const [updatedRows] = await db
+      .promise()
+      .query(
         'SELECT email_admin, first_name, last_name FROM admin WHERE email_admin=?',
-        [email_admin],
-        (err2, updatedRows) => {
-          if (err2) return res.status(500).json({ success: false, error: err2.message });
-
-          res.json({
-            success: true,
-            message: 'Profile updated successfully',
-            admin: updatedRows[0],
-          });
-        }
+        [email_admin]
       );
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      admin: updatedRows[0],
     });
-  });
+  } catch (err) {
+    console.error("ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
+
+
 
 
 // ______________________________ TESTQUESTIONS______________________________ //
@@ -457,7 +457,7 @@ app.post('/admin/practice/questions', (req, res) => {
     ],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'เพิ่มคำถามสำเร็จ', id: result.insertId });
+      res.json({ message: 'Successfully added question', id: result.insertId });
     }
   );
 });
@@ -497,7 +497,7 @@ app.put('/admin/practice/questions/:id', (req, res) => {
     ],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'อัปเดตคำถามสำเร็จ' });
+      res.json({ message: 'Successfully updated question   ' });
     }
   );
 });
@@ -509,7 +509,7 @@ app.delete('/admin/practice/questions/:id', (req, res) => {
     [req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'ลบคำถามสำเร็จ' });
+      res.json({ message: 'Successfully deleted question' });
     }
   );
 });
@@ -553,7 +553,7 @@ app.post('/admin/test/questions', (req, res) => {
     [test_Questions, answer1, answer2, answer3, correct_answer, tq_category_id],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'เพิ่มคำถามทดสอบสำเร็จ', id: result.insertId });
+      res.json({ message: 'Successfully added test questions', id: result.insertId });
     }
   );
 });
@@ -584,7 +584,7 @@ app.put('/admin/test/questions/:id', (req, res) => {
     ],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'อัปเดตคำถามทดสอบสำเร็จ' });
+      res.json({ message: 'Successfully update test questions' });
     }
   );
 });
@@ -596,76 +596,61 @@ app.delete('/admin/test/questions/:id', (req, res) => {
     [req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ message: 'ลบคำถามทดสอบสำเร็จ' });
+      res.json({ message: 'Successfully delete test questions' });
     }
   );
 });
  
 
-
-// เพิ่มใน server.js หรือ routes ของคุณ
-
-// บันทึกผลการทำแบบทดสอบ
-app.post('/api/saveTestResult', async (req, res) => {
-  const { total_score, t_category_id, t_email_member, test_questions } = req.body;
+//_____________________ TEST RESULTS ______________________//
+app.post('/savetest', async (req, res) => {
+  const { total_score, t_category_id, t_email_member } = req.body;
   
   try {
-    const connection = await pool.getConnection();
-    
-    // บันทึกข้อมูลหลัก
-    const [result] = await connection.query(
+    const result = await db.query(
       `INSERT INTO test (total_score, date, t_category_id, t_email_member) 
        VALUES (?, NOW(), ?, ?)`,
       [total_score, t_category_id, t_email_member]
     );
     
-    const testId = result.insertId;
-    
-    // บันทึกรายละเอียดแต่ละข้อคำถาม (ถ้าต้องการ)
-    if (test_questions && test_questions.length > 0) {
-      for (const questionId of test_questions) {
-        await connection.query(
-          `INSERT INTO test (total_score, date, t_category_id, t_email_member, t_test_questions_id) 
-           VALUES (?, NOW(), ?, ?, ?)`,
-          [total_score, t_category_id, t_email_member, questionId]
-        );
-      }
+    res.json({ 
+      success: true, 
+      test_id: result.insertId  // ส่ง ID กลับไปใช้
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+// ดึงประวัติการสอบทั้งหมด
+app.get('/history', (req, res) => {
+  const sql = 'SELECT test_id, total_score, date, t_category_id, t_email_member, t_test_questions_id FROM test_history ORDER BY date ASC';
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching history:', err);
+      return res.status(500).json({ error: 'Database error' });
     }
-    
-    connection.release();
-    res.json({ success: true, testId });
-  } catch (error) {
-    console.error('Error saving test result:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
+    res.json(results);
+  });
 });
 
-// ดึงประวัติการทำแบบทดสอบ
-app.get('/api/testHistory/:email', async (req, res) => {
-  const { email } = req.params;
-  
-  try {
-    const connection = await pool.getConnection();
-    const [rows] = await connection.query(
-      `SELECT t.test_id, t.total_score, t.date, t.t_category_id, c.category_name 
-       FROM test t 
-       LEFT JOIN category c ON t.t_category_id = c.category_id 
-       WHERE t.t_email_member = ? 
-       ORDER BY t.date DESC`,
-      [email]
-    );
-    connection.release();
-    res.json(rows);
-  } catch (error) {
-    console.error('Error fetching test history:', error);
-    res.status(500).json({ message: error.message });
-  }
+// ดึงประวัติการสอบตามหมวดหมู่
+app.get('/history/:categoryId', (req, res) => {
+  const { categoryId } = req.params;
+  const sql = `
+    SELECT test_id, total_score, date, t_category_id, t_email_member, t_test_questions_id
+    FROM test_history
+    WHERE t_category_id = ?
+    ORDER BY date ASC
+  `;
+  db.query(sql, [categoryId], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
 });
-
- 
-
-
-
 
 
 // Start server

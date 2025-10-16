@@ -6,9 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-  
+
 export default function Resulttest({ route, navigation }) {
-  const { score, total, questions = [], userAnswers = [] } = route.params;
+  const { score, total, questions = [], userAnswers = [], user } = route.params;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -17,7 +17,6 @@ export default function Resulttest({ route, navigation }) {
         Score: {score} / {total}
       </Text>
 
-      {/* แสดงรายการข้อ */}
       {questions.map((q, i) => {
         const isCorrect = q.correct_answer === userAnswers[i];
         return (
@@ -43,12 +42,11 @@ export default function Resulttest({ route, navigation }) {
         );
       })}
 
-      
       <TouchableOpacity
-        style={[styles.btn, { backgroundColor: '#007bff' }]}
-        onPress={() => navigation.replace('Categorytest')}
+        style={styles.btn}
+        onPress={() => navigation.goBack('Member')}
       >
-        <Text style={styles.btnText}>Back to Categories</Text>
+        <Text style={styles.btnText}>Back</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -75,6 +73,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    backgroundColor: '#007bff',
   },
   btnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });

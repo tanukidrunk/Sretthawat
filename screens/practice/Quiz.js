@@ -135,10 +135,10 @@ export default function Quiz({ route, navigation }) {
                   {
                     backgroundColor:
                       i === index
-                        ? '#007AFF' // current question
+                        ? '#007AFF' 
                         : answeredIndexes.includes(i)
-                        ? '#FFA500' // answered ? orange
-                        : '#ccc', // not answered
+                        ? '#FFA500' 
+                        : '#ccc', 
                   },
                 ]}
               />
