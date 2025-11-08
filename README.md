@@ -1,8 +1,7 @@
-# ProjectGG
+# แอปพลิเคชั่นฝึกแกรมม่า
 
-Quiz App 
-
-
+video แนะนำ project แอปพลิเคชั่นฝึกแกรมม่า
+https://youtu.be/7qIsUxdEXgI
 
 เครื่องมือที่ใช้ในการพัฒนา	
 
