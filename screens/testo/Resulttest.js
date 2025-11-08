@@ -10,6 +10,11 @@ import {
 export default function Resulttest({ route, navigation }) {
   const { score, total, questions = [], userAnswers = [], user } = route.params;
 
+  // ? แสดงเฉพาะข้อที่ตอบแล้ว
+  const answeredQuestions = questions
+    .map((q, i) => ({ ...q, userAnswer: userAnswers[i], index: i }))
+    .filter((item) => item.userAnswer !== null && item.userAnswer !== undefined);
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Test Result</Text>
@@ -17,21 +22,22 @@ export default function Resulttest({ route, navigation }) {
         Score: {score} / {total}
       </Text>
 
-      {questions.map((q, i) => {
-        const isCorrect = q.correct_answer === userAnswers[i];
+      {/* ? แสดงเฉพาะข้อที่ตอบ */}
+      {answeredQuestions.map((q) => {
+        const isCorrect = q.correct_answer === q.userAnswer;
         return (
           <View
-            key={i}
+            key={q.index}
             style={[
               styles.item,
               { backgroundColor: isCorrect ? '#d4edda' : '#f8d7da' },
             ]}
           >
             <Text style={styles.questionText}>
-              {i + 1}. {q.test_Questions}
+              {q.index + 1}. {q.test_Questions}
             </Text>
             <Text style={{ color: isCorrect ? '#155724' : '#721c24' }}>
-              Your answer: {userAnswers[i] || 'No answer'}
+              Your answer: {q.userAnswer}
             </Text>
             {!isCorrect && (
               <Text style={styles.correctAnswer}>

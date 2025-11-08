@@ -59,7 +59,7 @@ export default function Plist({ route, navigation }) {
         </Text>
       </TouchableOpacity>
 
-      {/* ปุ่มลบ */}
+      
       <TouchableOpacity
         onPress={() =>
           Alert.alert(
@@ -95,7 +95,7 @@ export default function Plist({ route, navigation }) {
       {/* -------- Title -------- */}
       <Text style={styles.title}>{categoryName}</Text>
 
-      {/* -------- ปุ่มเพิ่ม Practice -------- */}
+      
       <TouchableOpacity
         style={styles.button}
         onPress={() =>
@@ -105,7 +105,7 @@ export default function Plist({ route, navigation }) {
         <Text style={styles.buttonText}>+ Add Practice</Text>
       </TouchableOpacity>
 
-      {/* -------- รายการ Practice -------- */}
+      
       {loading ? (
         <ActivityIndicator size='large' color='green' />
       ) : (
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   item: {
-    flexDirection: 'row',   // ทำให้ชื่อและปุ่มอยู่ในแถวเดียว
+    flexDirection: 'row',   
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 20,

@@ -3,16 +3,21 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function Home({ navigation, route }) {
-  const [admin, setAdmin] = useState(route.params?.admin || {});
+  const initialAdmin = route?.params?.admin || {};
+  const [admin, setAdmin] = useState(initialAdmin);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      const updatedAdmin = route.params?.updatedAdmin;
-      if (updatedAdmin) setAdmin(updatedAdmin);
+      const updatedAdmin = route?.params?.updatedadmin;
+      if (updatedAdmin) {
+        console.log("? Admin Updated:", updatedAdmin);
+        setAdmin(updatedAdmin);
+      }
     });
+
     return unsubscribe;
-  }, [navigation, route.params]);
+  }, [navigation, route]);
 
   const handleLogout = () => {
     setModalVisible(false);
@@ -30,7 +35,7 @@ export default function Home({ navigation, route }) {
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Admin</Text>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Ionicons name='person-circle-outline' size={35} color='white' />
+          <Ionicons name="person-circle-outline" size={35} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -55,7 +60,7 @@ export default function Home({ navigation, route }) {
       <Modal
         transparent
         visible={modalVisible}
-        animationType='fade'
+        animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
         <TouchableOpacity
@@ -65,14 +70,12 @@ export default function Home({ navigation, route }) {
         >
           <View style={styles.menuContainer}>
             <TouchableOpacity style={styles.menuItem} onPress={handleProfile}>
-              <Ionicons name='person-outline' size={22} color='#007BFF' />
-              <Text style={[styles.menuText, { color: '#007BFF' }]}>
-                Profile
-              </Text>
+              <Ionicons name="person-outline" size={22} color="#007BFF" />
+              <Text style={[styles.menuText, { color: '#007BFF' }]}>Profile</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-              <Ionicons name='log-out-outline' size={22} color='red' />
+              <Ionicons name="log-out-outline" size={22} color="red" />
               <Text style={styles.menuText}>Logout</Text>
             </TouchableOpacity>
           </View>
@@ -96,11 +99,10 @@ const styles = StyleSheet.create({
   },
   topBarTitle: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
 
-  /* ?? ส่วนนี้คือส่วนที่เพิ่มใหม่ให้ปุ่มอยู่กลาง */
   mainContainer: {
     flex: 1,
-    justifyContent: 'center', // จัดให้อยู่กลางแนวตั้ง
-    alignItems: 'center', // จัดให้อยู่กลางแนวนอน
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   mainBtn: {

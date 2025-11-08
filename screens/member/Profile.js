@@ -15,28 +15,44 @@ export default function Profile({ route, navigation }) {
       Alert.alert('Error', 'กรุณากรอกชื่อและนามสกุล');
       return;
     }
+
+    if (!password && confirmPassword) {
+      Alert.alert('Error', 'กรุณากรอกรหัสผ่านให้ครบ');
+      return;
+    }
+
     if (password && password !== confirmPassword) {
       Alert.alert('Error', 'รหัสผ่านไม่ตรงกัน');
       return;
     }
-
+ 
     try {
-      const response = await axios.put(`http://10.0.2.2:3000/member/${user.email_member}`, {
-        first_name: firstName,
-        last_name: lastName,
-        ...(password ? { password } : {}),
-      });
+      const response = await axios.put(
+        `http://10.0.2.2:3000/member/${user.email_member}`,
+        {
+          first_name: firstName,
+          last_name: lastName,
+          ...(password ? { password } : {})
+        }
+      );
 
       if (response.data.success) {
         Alert.alert('Success', 'updated successfully');
 
-        // ส่งข้อมูลอัปเดตกลับ Member ผ่าน goBack()
+        //ส่งข้อมูลกลับไปหน้า Member ให้ update state
         navigation.navigate('Member', {
-          updatedUser: { ...user, first_name: firstName, last_name: lastName }
+          updatedUser: {
+            ...user,
+            first_name: firstName,
+            last_name: lastName
+          }
         });
-      } else {
-        Alert.alert('Error', 'error occurred while updating the data.');
+
+        // ล้าง password หลังอัปเดต
+        setPassword('');
+        setConfirmPassword('');
       }
+
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Unable to connect to server');
@@ -51,11 +67,21 @@ export default function Profile({ route, navigation }) {
       <Text style={styles.label}>Last Name</Text>
       <TextInput style={styles.input} value={lastName} onChangeText={setLastName} />
 
-      <Text style={styles.label}>Password </Text>
-      <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
+      <Text style={styles.label}>Password</Text>
+      <TextInput
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
       <Text style={styles.label}>Confirm Password</Text>
-      <TextInput style={styles.input} value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+      <TextInput
+        style={styles.input}
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+      />
 
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
         <Text style={styles.saveText}>Save</Text>
@@ -67,8 +93,20 @@ export default function Profile({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#f5f5f5' },
   label: { fontSize: 16, fontWeight: 'bold', marginTop: 15 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginTop: 5, backgroundColor: '#fff' },
-  saveBtn: { marginTop: 30, backgroundColor: '#007BFF', paddingVertical: 15, borderRadius: 12, alignItems: 'center' },
-  saveText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 5,
+    backgroundColor: '#fff'
+  },
+  saveBtn: {
+    marginTop: 30,
+    backgroundColor: '#007BFF',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center'
+  },
+  saveText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }
 });
- 

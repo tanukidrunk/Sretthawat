@@ -28,7 +28,7 @@ export default function Practiceform({ route, navigation }) {
 
     Alert.alert("Success", "Practice saved successfully");
 
-    if (refresh) refresh(); // refresh list ใน Plist
+    if (refresh) refresh(); 
     navigation.goBack();
   } catch (err) {
     console.error(err.response?.data || err.message);

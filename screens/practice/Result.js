@@ -48,7 +48,7 @@ export default function Result({ route, navigation }) {
 
       <TouchableOpacity
         style={[styles.btn, { backgroundColor: '#007bff' }]}
-        onPress={() => navigation.replace('Category')}
+        onPress={() => navigation.replace('Guest')}
       >
         <Text style={styles.btnText}>Back to Categories</Text>
       </TouchableOpacity>

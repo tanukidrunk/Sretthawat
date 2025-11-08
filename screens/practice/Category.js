@@ -7,7 +7,7 @@ export default function Category({ navigation }) {
     { id: 2, label: 'Verb' },
     { id: 3, label: 'Tense' },
   ];
- 
+
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -20,7 +20,7 @@ export default function Category({ navigation }) {
         <Text style={styles.header}>Category</Text>
       </View>
 
-      {/* ??????? */}
+      {/* List */}
       <View style={styles.content}>
         {categories.map((item) => (
           <TouchableOpacity
@@ -28,8 +28,8 @@ export default function Category({ navigation }) {
             style={styles.button}
             onPress={() =>
               navigation.navigate('Practice', {
-                category: item.id,
-                title: item.label,
+                categoryId: item.id,       
+                categoryName: item.label,  
               })
             }
           >
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // ? ??? Back ???????? Header ???????
+    justifyContent: 'space-between',
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,

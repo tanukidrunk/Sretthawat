@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-   
+
 export default function Member({ route, navigation }) {
   const [user, setUser] = useState(route.params?.user || {});
   const [modalVisible, setModalVisible] = useState(false);
 
+  // รับข้อมูลอัปเดตจากหน้า Profile
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      const updatedUser = route.params?.updatedUser;
-      if (updatedUser) setUser(updatedUser);
-    });
-    return unsubscribe;
-  }, [navigation, route.params]);
+    if (route.params?.updatedUser) {
+      setUser(route.params.updatedUser);
+    }
+  }, [route.params?.updatedUser]);
 
   const handleLogout = () => {
     setModalVisible(false);
     navigation.replace('Guest');
   };
- 
+
   const handleProfile = () => {
     setModalVisible(false);
     navigation.navigate('Profile', { user });
@@ -51,7 +50,6 @@ export default function Member({ route, navigation }) {
         <Text>No user data received</Text>
       )}
 
-      {/* Buttons */}
       <TouchableOpacity
         style={[styles.mainBtn, { backgroundColor: '#ffffffff' }]}
         onPress={() => navigation.navigate('Category')}
@@ -61,14 +59,16 @@ export default function Member({ route, navigation }) {
 
       <TouchableOpacity
         style={[styles.mainBtn, { backgroundColor: '#ffffffff' }]}
-        onPress={() => navigation.navigate('Categorytest', { email_member: user.email_member })}
+        onPress={() =>
+          navigation.navigate('Categorytest', {
+            email_member: user.email_member,
+          })
+        }
       >
         <Text style={styles.btnText}>Toeic Test</Text>
       </TouchableOpacity>
 
-  
-
-      {/* Profile Menu Modal */}
+      
       <Modal
         transparent={true}
         visible={modalVisible}
@@ -105,8 +105,6 @@ export default function Member({ route, navigation }) {
     </View>
   );
 }
- 
-// Styles เหมือนเดิม
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5', alignItems: 'center' },
   topBar: {

@@ -14,7 +14,7 @@ export default function Practice({ route, navigation }) {
   const { category, title } = route.params;
   const [practices, setPractices] = useState([]);
   const [loading, setLoading] = useState(true);
-
+ 
   useEffect(() => {
     fetchPractices();
   }, []);

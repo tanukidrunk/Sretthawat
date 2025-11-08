@@ -54,7 +54,7 @@ export default function Quiz({ route, navigation }) {
       setLoading(false);
     }
   };
-
+ 
   const handleAnswer = (selected) => {
     const currentQ = questions[index];
     let explanationText = '';

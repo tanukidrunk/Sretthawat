@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-
+import { useFocusEffect } from '@react-navigation/native';
+  
 export default function History({ route, navigation }) {
-  const { categoryId, categoryName } = route.params; 
+  const { categoryId, categoryName } = route.params;
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ?? ??????????????????????????
   const fetchHistory = async () => {
     try {
       const response = await axios.get(`http://10.0.2.2:3000/history/${categoryId}`);
@@ -21,25 +21,31 @@ export default function History({ route, navigation }) {
     }
   };
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const chartData = {
-    labels: history.map(item => item.date.split(' ')[0]),
-    datasets: [
-      {
-        data: history.map(item => item.total_score),
-        color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
-        strokeWidth: 2,
-      },
-    ],
-  };
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchHistory();
+    }, [])
+  );
+  
+  const chartData =
+    history.length > 0
+      ? {
+          labels: history.map(item => item.date ? item.date.split(' ')[0] : ''),
+          datasets: [
+            {
+              data: history.map(item => item.total_score),
+              color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+              strokeWidth: 2,
+            },
+          ],
+        }
+      : null;
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.text}>Score: {item.total_score}</Text>
-      <Text style={styles.text}>Date: {item.date}</Text>
+      <Text style={styles.text}>Date: {item.date || "N/A"}</Text>
       <Text style={styles.text}>Category ID: {item.t_category_id}</Text>
     </View>
   );
@@ -59,9 +65,9 @@ export default function History({ route, navigation }) {
         <Text style={styles.backText}>Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Test History — {categoryName}</Text>
+      <Text style={styles.title}>Test History {categoryName}</Text>
 
-      {history.length > 0 && (
+      {chartData && (
         <LineChart
           data={chartData}
           width={Dimensions.get('window').width - 32}
@@ -85,9 +91,12 @@ export default function History({ route, navigation }) {
           data={history}
           keyExtractor={(item) => item.test_id.toString()}
           renderItem={renderItem}
+          scrollEnabled={false}
         />
       ) : (
-        <Text style={styles.text}>There is no test history yet</Text>
+        <Text style={{ textAlign: "center", marginTop: 20, fontSize: 16 }}>
+          There is no test history yet
+        </Text>
       )}
     </ScrollView>
   );

@@ -82,7 +82,7 @@ export default function Pquestionform({ route, navigation }) {
                 `http://10.0.2.2:3000/admin/practice/questions/${questionId}`
               );
               Alert.alert('Deleted', 'Question deleted successfully');
-              fetchQuestions(); // โหลดข้อมูลใหม่หลังลบ
+              fetchQuestions(); 
             } catch (err) {
               console.error('Delete question error:', err);
               Alert.alert('Error', 'Failed to delete question');
