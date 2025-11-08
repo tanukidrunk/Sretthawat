@@ -14,7 +14,7 @@ https://youtu.be/7qIsUxdEXgI
 5)	React-native
 6)	MySQL
 
-1.5.2 ภาษาที่ใข้พัฒนา
+ภาษาที่ใข้พัฒนา
 1)	javascript
 2)	CSS
 3)	SQL
@@ -25,34 +25,34 @@ https://youtu.be/7qIsUxdEXgI
 ฟีเจอร์หลัก
 1. ระบบผู้ใช้
 
-1.1สมัคร/ล็อกอิน 
+1.1 สมัคร/ล็อกอิน 
 
-โปรไฟล์ผู้ใช้ พร้อมแก้ไขข้อมูล
+1.2 โปรไฟล์ผู้ใช้ พร้อมแก้ไขข้อมูล
 
-ประวัติการทำ quiz และการฝึก (History)
+1.3 ประวัติการทำ quiz และการฝึก (History)
 
 2. ระบบผู้ดูแล (Admin)
    
-จัดการ quiz / practice / test
+2.1 จัดการ practice / test
 
-เพิ่ม, แก้ไข, ลบคำถาม
+2.2 เพิ่ม, แก้ไข, ลบคำถาม
 
 
 3. Quiz & Practice
    
-แยกเป็น Practice mode และ Test mode
+3.1 แยกเป็น Practice mode และ Test mode
 
-ประเภทคำถาม:Multiple Choice (4 ตัวเลือก)
+3.2 ประเภทคำถาม:Multiple Choice (4 ตัวเลือก)
 
-มี ระบบจับเวลา สำหรับ Test mode
+3.3 มีระบบจับเวลา สำหรับ Test mode
 
 
 
 4. Visualization
 
-แสดง กราฟผลลัพธ์ (History)
+4.1 แสดง กราฟผลลัพธ์ (History)
 
-Chart ดู trend การทำ quiz และคะแนน
+4.2 Chart ดู trend การทำ quiz และคะแนน
 
 
 
